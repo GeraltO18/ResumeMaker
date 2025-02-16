@@ -18,7 +18,7 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     listOf(
         iosX64(),
         iosArm64(),
@@ -29,7 +29,7 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         moduleName = "composeApp"
@@ -49,7 +49,7 @@ kotlin {
         }
         binaries.executable()
     }
-    
+
     sourceSets {
         val voyagerVersion = "1.1.0-beta02"
 
@@ -60,10 +60,10 @@ kotlin {
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
+            implementation(compose.material3)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.voyager.screenmodel)
@@ -97,8 +97,8 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 }
-
 dependencies {
+    implementation(libs.androidx.material3.android)
     debugImplementation(compose.uiTooling)
 }
 
