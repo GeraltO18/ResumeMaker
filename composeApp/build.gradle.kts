@@ -51,7 +51,8 @@ kotlin {
     }
     
     sourceSets {
-        
+        val voyagerVersion = "1.1.0-beta02"
+
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
@@ -65,6 +66,7 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
+            implementation(libs.voyager.screenmodel)
         }
     }
 }
