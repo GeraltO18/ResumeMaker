@@ -1,10 +1,8 @@
 package com.resumemaker.editor.presentation.ui.components.buttons
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -13,8 +11,8 @@ import com.resumemaker.editor.presentation.ui.components.themes.ButtonShapes
 import com.resumemaker.editor.presentation.ui.components.themes.ResumeMakerColors as Colors
 
 sealed class ButtonType {
-    object Primary : ButtonType()
-    object Secondary : ButtonType()
+    data object Primary : ButtonType()
+    data object Secondary : ButtonType()
 }
 
 @Composable
