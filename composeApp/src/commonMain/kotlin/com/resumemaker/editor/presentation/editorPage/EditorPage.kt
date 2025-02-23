@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -33,6 +35,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,6 +48,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -53,6 +59,8 @@ import org.jetbrains.compose.resources.painterResource
 import resumemaker.composeapp.generated.resources.Res
 import resumemaker.composeapp.generated.resources.University_Student_Resume_Template_web1
 import resumemaker.composeapp.generated.resources.standout_resume_template
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
 fun EditorPage(){
@@ -237,57 +245,147 @@ fun Previewer() {
 
 @Composable
 fun educationDropdown() {
-    var expanded by remember { mutableStateOf(false) }
-    val educationList = listOf(
+    var isExpanded by remember { mutableStateOf(false) }
+    val defaultEducationList = listOf(
         "PSG College of Technology, BTech IT",
         "K.V.S. Matriculation Higher Secondary School, 12th standard",
         "K.V.S. English Medium School, 10th standard"
     )
+    var educationItems by remember { mutableStateOf(defaultEducationList) }
+    val listState = rememberLazyListState()
+    val reorderableState = rememberReorderableLazyListState(listState) { from, to ->
+        educationItems = educationItems.toMutableList().apply {
+            add(to.index, removeAt(from.index))
+        }
+    }
 
-    Column(Modifier.fillMaxWidth().padding(16.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
         // Header Panel
         Card(
-            Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
-                .clickable { expanded = !expanded },
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .clickable { isExpanded = !isExpanded }
         ) {
             Row(
-                Modifier.padding(16.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Home, contentDescription = "Education", tint = Color.Black)
-                    Spacer(Modifier.width(8.dp))
-                    Text("Education", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Icon(
+                        imageVector = Icons.Default.Home,
+                        contentDescription = "Education",
+                        tint = Color.Black
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Education",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
                 }
                 Icon(
-                    imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = "Expand", tint = Color.Black
+                    imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    contentDescription = "Expand",
+                    tint = Color.Black
                 )
             }
         }
 
         // Expandable Content
-        AnimatedVisibility(visible = expanded) {
-            Column(Modifier.fillMaxWidth().padding(8.dp).background(Color.White, RoundedCornerShape(12.dp))) {
-                educationList.forEach { education ->
-                    Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.MoreVert, contentDescription = null, tint = Color.Gray)
-                        Spacer(Modifier.width(8.dp))
-                        Text(education, fontSize = 16.sp)
-                        Spacer(Modifier.weight(1f))
-                        Icon(Icons.Default.Edit, contentDescription = "View", tint = Color.Gray)
+        AnimatedVisibility(visible = isExpanded) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+                    .background(Color.White, RoundedCornerShape(12.dp))
+            ) {
+                LazyColumn(state = listState) {
+                    itemsIndexed(educationItems, key = { _, item -> item }) { index, item ->
+                        ReorderableItem(reorderableState, key = item) { _ ->
+                            Column(
+                                modifier = Modifier.semantics {
+                                    customActions = listOf(
+                                        CustomAccessibilityAction(
+                                            label = "Move Up",
+                                            action = {
+                                                if (index > 0) {
+                                                    educationItems = educationItems.toMutableList().apply {
+                                                        add(index - 1, removeAt(index))
+                                                    }
+                                                    true
+                                                } else false
+                                            }
+                                        ),
+                                        CustomAccessibilityAction(
+                                            label = "Move Down",
+                                            action = {
+                                                if (index < educationItems.size - 1) {
+                                                    educationItems = educationItems.toMutableList().apply {
+                                                        add(index + 1, removeAt(index))
+                                                    }
+                                                    true
+                                                } else false
+                                            }
+                                        )
+                                    )
+                                }
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    IconButton(
+                                        modifier = Modifier.draggableHandle(
+                                            onDragStarted = { /* No-op for web */ },
+                                            onDragStopped = { /* No-op for web */ }
+                                        ),
+                                        onClick = { }
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.MoreVert,
+                                            contentDescription = "Reorder",
+                                            tint = Color.Gray
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(text = item, fontSize = 16.sp)
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Icon(
+                                        imageVector = Icons.Default.Edit,
+                                        contentDescription = "Edit",
+                                        tint = Color.Gray
+                                    )
+                                }
+                                HorizontalDivider(color = Color.LightGray)
+                            }
+                        }
                     }
-                    HorizontalDivider(color = Color.LightGray)
                 }
                 // Add Education Button
                 Row(
-                    Modifier.fillMaxWidth().clickable { /* Add education logic */ }.padding(16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { /* Add education logic */ }
+                        .padding(16.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = "Add", tint = Color.Black)
-                    Spacer(Modifier.width(8.dp))
-                    Text("Add Education", fontSize = 16.sp)
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add",
+                        tint = Color.Black
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = "Add Education", fontSize = 16.sp)
                 }
             }
         }

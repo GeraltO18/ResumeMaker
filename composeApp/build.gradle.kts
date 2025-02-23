@@ -68,6 +68,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.voyager.screenmodel)
             implementation(libs.kotlinx.datetime)
+            implementation(libs.reorderable)
         }
     }
 }
