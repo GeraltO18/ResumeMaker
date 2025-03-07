@@ -39,6 +39,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,9 +62,13 @@ import resumemaker.composeapp.generated.resources.University_Student_Resume_Temp
 import resumemaker.composeapp.generated.resources.standout_resume_template
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
+import androidx.lifecycle.ViewModel
 
 @Composable
-fun EditorPage(){
+fun EditorPage(viewModel: EditorViewModel){
+
+    val isEdTabOpen by viewModel.isEdTabOpen.collectAsState()
+
     Row(modifier = Modifier.fillMaxSize()) { // Main page
         Column(modifier = Modifier.weight(1f).fillMaxHeight().background(Color(0xFFFAF3DD))){ // Form
             Row{
@@ -83,7 +88,7 @@ fun EditorPage(){
                 Column(Modifier.weight(0.8f).fillMaxHeight()) {
                     resumeName()
                     personalDetail()
-                    educationDropdown()
+                    educationDropdown(viewModel,isEdTabOpen)
                 }
             }
         }
@@ -244,8 +249,10 @@ fun Previewer() {
 }
 
 @Composable
-fun educationDropdown() {
-    var isExpanded by remember { mutableStateOf(false) }
+fun educationDropdown(
+    viewModel: EditorViewModel,
+    isEdTabOpen: Boolean
+) {
     val defaultEducationList = listOf(
         "PSG College of Technology, BTech IT",
         "K.V.S. Matriculation Higher Secondary School, 12th standard",
@@ -269,7 +276,7 @@ fun educationDropdown() {
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
-                .clickable { isExpanded = !isExpanded }
+                .clickable { viewModel.toggleEdTab() }
         ) {
             Row(
                 modifier = Modifier
@@ -292,7 +299,7 @@ fun educationDropdown() {
                     )
                 }
                 Icon(
-                    imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    imageVector = if (isEdTabOpen) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = "Expand",
                     tint = Color.Black
                 )
@@ -300,7 +307,7 @@ fun educationDropdown() {
         }
 
         // Expandable Content
-        AnimatedVisibility(visible = isExpanded) {
+        AnimatedVisibility(visible = isEdTabOpen) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
