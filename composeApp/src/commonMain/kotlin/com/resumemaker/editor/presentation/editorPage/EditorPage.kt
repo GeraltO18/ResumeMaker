@@ -11,7 +11,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Edit
@@ -25,7 +28,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,14 +36,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.resumemaker.editor.domain.BaseViewModel
 import com.resumemaker.editor.presentation.editorPage.dropDowns.eduForm
-import com.resumemaker.editor.presentation.editorPage.dropDowns.educationDropdown
+import com.resumemaker.editor.presentation.editorPage.dropDowns.tabDropDown
 import com.resumemaker.editor.presentation.editorPage.preview.Previewer
 
 @Composable
-fun EditorPage(viewModel: EditorViewModel){
+fun EditorPage(viewModel: BaseViewModel){
 
-    val showEdForm by viewModel.showEdForm.collectAsState()
+    val displayPage = viewModel.displayPage.collectAsState()
+    val defaultEducationList = listOf(
+        "PSG College of Technology, BTech IT",
+        "K.V.S. Matriculation Higher Secondary School, 12th standard",
+        "K.V.S. English Medium School, 10th standard"
+    )
+    val defaultWorkList = listOf(
+        "IBM pvt ltd",
+        "Software AG",
+        "Restogrow"
+    )
 
     Row(modifier = Modifier.fillMaxSize()) { // Main page
         Column(modifier = Modifier.weight(1f).fillMaxHeight().background(Color(0xFFFAF3DD))){ // Form
@@ -59,13 +72,22 @@ fun EditorPage(viewModel: EditorViewModel){
                 }
 
                 // ContentList
-                Column(Modifier.weight(0.8f).fillMaxHeight()) {
-                    if(!showEdForm) {
-                        resumeName()
-                        personalDetail()
-                        educationDropdown(viewModel)
-                    } else {
-                        eduForm(viewModel)
+                Column(
+                    Modifier
+                    .weight(0.8f)
+                    .fillMaxHeight()
+                    .verticalScroll(rememberScrollState())
+                ) {
+                    when(displayPage.value) {
+                        "Home" -> {
+                                resumeName()
+                                personalDetail()
+                                tabDropDown(viewModel,"Education",defaultEducationList)
+                                tabDropDown(viewModel,"Work",defaultWorkList)
+                        }
+                        "EducationForm" -> {
+                                eduForm(viewModel)
+                        }
                     }
                 }
             }

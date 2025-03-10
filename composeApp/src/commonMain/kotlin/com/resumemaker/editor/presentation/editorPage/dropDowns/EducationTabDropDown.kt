@@ -4,18 +4,21 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
@@ -46,25 +49,22 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.resumemaker.editor.presentation.editorPage.EditorViewModel
+import com.resumemaker.editor.domain.BaseViewModel
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
-fun educationDropdown(
-    viewModel: EditorViewModel
+fun tabDropDown(
+    viewModel: BaseViewModel,
+    title: String,
+    data: List<String>
 ) {
-    val isEdTabOpen by viewModel.isEdTabOpen.collectAsState()
+    val isTabOpen by viewModel.getTabStateFlow(title).collectAsState()
 
-    val defaultEducationList = listOf(
-        "PSG College of Technology, BTech IT",
-        "K.V.S. Matriculation Higher Secondary School, 12th standard",
-        "K.V.S. English Medium School, 10th standard"
-    )
-    var educationItems by remember { mutableStateOf(defaultEducationList) }
+    var listItems by remember { mutableStateOf(data) }
     val listState = rememberLazyListState()
     val reorderableState = rememberReorderableLazyListState(listState) { from, to ->
-        educationItems = educationItems.toMutableList().apply {
+        listItems = listItems.toMutableList().apply {
             add(to.index, removeAt(from.index))
         }
     }
@@ -79,7 +79,7 @@ fun educationDropdown(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
-                .clickable { viewModel.toggleEdTab() }
+                .clickable { viewModel.toggleTab(title) }
         ) {
             Row(
                 modifier = Modifier
@@ -96,13 +96,13 @@ fun educationDropdown(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Education",
+                        text = title,
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp
                     )
                 }
                 Icon(
-                    imageVector = if (isEdTabOpen) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    imageVector = if (isTabOpen) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = "Expand",
                     tint = Color.Black
                 )
@@ -110,83 +110,86 @@ fun educationDropdown(
         }
 
         // Expandable Content
-        AnimatedVisibility(visible = isEdTabOpen) {
+        AnimatedVisibility(visible = isTabOpen) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)
                     .background(Color.White, RoundedCornerShape(12.dp))
             ) {
-                LazyColumn(state = listState) {
-                    itemsIndexed(educationItems, key = { _, item -> item }) { index, item ->
-                        ReorderableItem(reorderableState, key = item) { _ ->
-                            Column(
-                                modifier = Modifier.semantics {
-                                    customActions = listOf(
-                                        CustomAccessibilityAction(
-                                            label = "Move Up",
-                                            action = {
-                                                if (index > 0) {
-                                                    educationItems = educationItems.toMutableList().apply {
-                                                        add(index - 1, removeAt(index))
-                                                    }
-                                                    true
-                                                } else false
-                                            }
-                                        ),
-                                        CustomAccessibilityAction(
-                                            label = "Move Down",
-                                            action = {
-                                                if (index < educationItems.size - 1) {
-                                                    educationItems = educationItems.toMutableList().apply {
-                                                        add(index + 1, removeAt(index))
-                                                    }
-                                                    true
-                                                } else false
-                                            }
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier.height(200.dp)
+                ) {
+                        itemsIndexed(listItems, key = { _, item -> item }) { index, item ->
+                            ReorderableItem(reorderableState, key = item) { _ ->
+                                Column(
+                                    modifier = Modifier.semantics {
+                                        customActions = listOf(
+                                            CustomAccessibilityAction(
+                                                label = "Move Up",
+                                                action = {
+                                                    if (index > 0) {
+                                                        listItems = listItems.toMutableList().apply {
+                                                            add(index - 1, removeAt(index))
+                                                        }
+                                                        true
+                                                    } else false
+                                                }
+                                            ),
+                                            CustomAccessibilityAction(
+                                                label = "Move Down",
+                                                action = {
+                                                    if (index < listItems.size - 1) {
+                                                        listItems = listItems.toMutableList().apply {
+                                                            add(index + 1, removeAt(index))
+                                                        }
+                                                        true
+                                                    } else false
+                                                }
+                                            )
                                         )
-                                    )
-                                }
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(12.dp),
-                                    verticalAlignment = Alignment.CenterVertically
+                                    }
                                 ) {
-                                    IconButton(
-                                        modifier = Modifier.draggableHandle(
-                                            onDragStarted = { /* No-op for web */ },
-                                            onDragStopped = { /* No-op for web */ }
-                                        ),
-                                        onClick = { }
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(12.dp),
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
+                                        IconButton(
+                                            modifier = Modifier.draggableHandle(
+                                                onDragStarted = { /* No-op for web */ },
+                                                onDragStopped = { /* No-op for web */ }
+                                            ),
+                                            onClick = { }
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.MoreVert,
+                                                contentDescription = "Reorder",
+                                                tint = Color.Gray
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(text = item, fontSize = 16.sp)
+                                        Spacer(modifier = Modifier.weight(1f))
                                         Icon(
-                                            imageVector = Icons.Default.MoreVert,
-                                            contentDescription = "Reorder",
+                                            modifier = Modifier.clickable { viewModel.changeDisplayPage("EducationForm") },
+                                            imageVector = Icons.Default.Edit,
+                                            contentDescription = "Edit",
                                             tint = Color.Gray
                                         )
                                     }
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(text = item, fontSize = 16.sp)
-                                    Spacer(modifier = Modifier.weight(1f))
-                                    Icon(
-                                        modifier = Modifier.clickable { viewModel.toggleShowEdForm() },
-                                        imageVector = Icons.Default.Edit,
-                                        contentDescription = "Edit",
-                                        tint = Color.Gray
-                                    )
+                                    HorizontalDivider(color = Color.LightGray)
                                 }
-                                HorizontalDivider(color = Color.LightGray)
                             }
                         }
                     }
-                }
                 // Add Education Button
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { viewModel.toggleShowEdForm() }
+                        .clickable { viewModel.changeDisplayPage("EducationForm") }
                         .padding(16.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
@@ -196,7 +199,7 @@ fun educationDropdown(
                         tint = Color.Black
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "Add Education", fontSize = 16.sp)
+                    Text(text = "Add $title", fontSize = 16.sp)
                 }
             }
         }
@@ -205,7 +208,7 @@ fun educationDropdown(
 
 @Composable
 fun eduForm(
-    viewModel: EditorViewModel
+    viewModel: BaseViewModel
 ){
     val qualification = remember { mutableStateOf("") }
     val collegeName = remember { mutableStateOf("School Name") }
@@ -296,11 +299,11 @@ fun eduForm(
                 )
                 Spacer(modifier = Modifier.height(5.dp))
                 Row {
-                    Button(onClick = { viewModel.toggleShowEdForm() }) {
+                    Button(onClick = { viewModel.changeDisplayPage("Home") }) {
                         Text("Save")
                     }
                     Spacer(modifier = Modifier.width(8.dp))
-                    Button(onClick = { viewModel.toggleShowEdForm() }) {
+                    Button(onClick = { viewModel.changeDisplayPage("Home") }) {
                         Text("Cancel")
                     }
                 }
