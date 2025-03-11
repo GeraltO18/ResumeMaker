@@ -55,6 +55,12 @@ fun EditorPage(viewModel: BaseViewModel){
         "Software AG",
         "Restogrow"
     )
+    val defaultSkillList = listOf(
+        "Frontend",
+        "Backend",
+        "Data"
+    )
+    val tabList = listOf("Education","Work","Skills")
 
     Row(modifier = Modifier.fillMaxSize()) { // Main page
         Column(modifier = Modifier.weight(1f).fillMaxHeight().background(Color(0xFFFAF3DD))){ // Form
@@ -84,6 +90,7 @@ fun EditorPage(viewModel: BaseViewModel){
                                 personalDetail()
                                 tabDropDown(viewModel,"Education",defaultEducationList)
                                 tabDropDown(viewModel,"Work",defaultWorkList)
+                                tabDropDown(viewModel,"Skills",defaultSkillList)
                         }
                         "EducationForm" -> {
                                 eduForm(viewModel)
