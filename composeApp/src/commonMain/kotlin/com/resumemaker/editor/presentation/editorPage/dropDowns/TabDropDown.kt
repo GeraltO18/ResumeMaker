@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,13 +12,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
@@ -202,112 +198,6 @@ fun tabDropDown(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(text = "Add $title", fontSize = 16.sp)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun eduForm(
-    viewModel: BaseViewModel
-){
-    val qualification = remember { mutableStateOf("") }
-    val collegeName = remember { mutableStateOf("School Name") }
-    val year = remember { mutableStateOf("") }
-    val minor = remember { mutableStateOf("") }
-    val gpa = remember { mutableStateOf("") }
-    val description = remember { mutableStateOf("") }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-        ) {
-            Column(
-                modifier = Modifier.padding(15.dp)
-            ){
-                Text(collegeName.value, fontSize = 25.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-                Spacer(modifier = Modifier.height(5.dp))
-                OutlinedTextField(
-                    value = qualification.value,
-                    onValueChange = { qualification.value = it },
-                    label = { Text("What is your degree/qualification?") },
-                    placeholder = { Text("10th, 12th, BTech") },
-                    singleLine = true,
-                    modifier = Modifier
-                        .fillMaxWidth(),
-//                    isError = text.value.isNotEmpty() && !text.value.contains('@'),
-                )
-                Spacer(modifier = Modifier.height(5.dp))
-                OutlinedTextField(
-                    value = collegeName.value,
-                    onValueChange = { collegeName.value = it },
-                    label = { Text("Where did you earn your degree/qualification?") },
-                    placeholder = { Text("PSG College of Technology") },
-                    singleLine = true,
-                    modifier = Modifier
-                        .fillMaxWidth(),
-//                    isError = text.value.isNotEmpty() && !text.value.contains('@'),
-                )
-                Spacer(modifier = Modifier.height(5.dp))
-                OutlinedTextField(
-                    value = year.value,
-                    onValueChange = { year.value = it },
-                    label = { Text("When did you earn it?") },
-                    placeholder = { Text("2024") },
-                    singleLine = true,
-                    modifier = Modifier
-                        .fillMaxWidth(),
-//                    isError = text.value.isNotEmpty() && !text.value.contains('@'),
-                )
-                Spacer(modifier = Modifier.height(5.dp))
-                OutlinedTextField(
-                    value = minor.value,
-                    onValueChange = { minor.value = it },
-                    label = { Text("Did you minor in anything ?") },
-                    placeholder = { Text("cs") },
-                    singleLine = true,
-                    modifier = Modifier
-                        .fillMaxWidth(),
-//                    isError = text.value.isNotEmpty() && !text.value.contains('@'),
-                )
-                Spacer(modifier = Modifier.height(5.dp))
-                OutlinedTextField(
-                    value = gpa.value,
-                    onValueChange = { gpa.value = it },
-                    label = { Text("GPA (if applicable)") },
-                    placeholder = { Text("8.39") },
-                    singleLine = true,
-                    modifier = Modifier
-                        .fillMaxWidth(),
-//                    isError = text.value.isNotEmpty() && !text.value.contains('@'),
-                )
-                Spacer(modifier = Modifier.height(5.dp))
-                OutlinedTextField(
-                    value = description.value,
-                    onValueChange = { description.value = it },
-                    label = { Text("Open field for additional information") },
-                    placeholder = { Text("summa") },
-                    singleLine = true,
-                    modifier = Modifier
-                        .fillMaxWidth(),
-//                    isError = text.value.isNotEmpty() && !text.value.contains('@'),
-                )
-                Spacer(modifier = Modifier.height(5.dp))
-                Row {
-                    Button(onClick = { viewModel.changeDisplayPage("Home") }) {
-                        Text("Save")
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Button(onClick = { viewModel.changeDisplayPage("Home") }) {
-                        Text("Cancel")
-                    }
                 }
             }
         }
