@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -47,6 +48,7 @@ import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.resumemaker.editor.domain.BaseViewModel
@@ -171,10 +173,10 @@ fun tabDropDown(
                                             )
                                         }
                                         Spacer(modifier = Modifier.width(8.dp))
-                                        Text(text = item, fontSize = 16.sp)
+                                        Text(text = item, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
                                         Spacer(modifier = Modifier.weight(1f))
                                         Icon(
-                                            modifier = Modifier.clickable { viewModel.changeDisplayPage("EducationForm") },
+                                            modifier = Modifier.size(24.dp).clickable { viewModel.changeDisplayPage("EducationForm") },
                                             imageVector = Icons.Default.Edit,
                                             contentDescription = "Edit",
                                             tint = Color.Gray
